@@ -23,5 +23,7 @@ KEY_HUMIDITY = "humidity"
 KEY_FAN = "fan"
 KEY_MODE = "mode"
 
-# How often to poll
-REFRESH_RATE = 180
+# Options
+CONF_REFRESH_RATE = "conf_refresh_rate"
+CONF_REFRESH_RATE_DEFAULT = 300
+CONF_SILENT_AUTO = "conf_silent_auto"

@@ -4,7 +4,7 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
-from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, REFRESH_RATE
+from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT, CONF_SILENT_AUTO
 from .api import MolekuleApi
 
 class MolekuleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -43,6 +43,12 @@ class MolekuleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        return MolekuleOptionsFlow(config_entry)
+
+
 class MolekuleOptionsFlow(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
@@ -61,8 +67,12 @@ class MolekuleOptionsFlow(config_entries.OptionsFlow):
                 {
                     vol.Optional(
                         "sync_interval",
-                        default=self.config_entry.options.get("sync_interval", REFRESH_RATE),
+                        default=self.config_entry.options.get(CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT),
                     ): int,
+                    vol.Optional(
+                        CONF_SILENT_AUTO,
+                        default=self.config_entry.options.get(CONF_SILENT_AUTO, False),
+                    ): bool,
                 }
             ),
         )

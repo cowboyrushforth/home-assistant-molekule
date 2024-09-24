@@ -7,7 +7,7 @@ from homeassistant.util.percentage import (
     percentage_to_ranged_value,
 )
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
-from .const import DOMAIN
+from .const import DOMAIN, CONF_SILENT_AUTO
 import logging
 
 
@@ -76,7 +76,7 @@ class MolekuleFan(CoordinatorEntity, FanEntity):
             await self.coordinator.async_request_refresh()
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
-        silent_auto = self.coordinator.config_entry.options.get('silent_auto', False)
+        silent_auto = self.coordinator.config_entry.options.get(CONF_SILENT_AUTO, False)
         await self._api.set_auto_mode(self._device_id, preset_mode == "auto", silent_auto)
         await self.coordinator.async_request_refresh()
 

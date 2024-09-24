@@ -8,7 +8,7 @@ from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.const import CONF_MODEL
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from .const import DOMAIN, MANUFACTURER, CONF_EMAIL, CONF_PASSWORD, REFRESH_RATE
+from .const import DOMAIN, MANUFACTURER, CONF_EMAIL, CONF_PASSWORD, CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT
 from .api import MolekuleApi
 
 PLATFORMS: list[str] = ["fan", "sensor"]
@@ -66,7 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER,
         name="molekule_devices",
         update_method=async_update_data,
-        update_interval=timedelta(seconds=entry.options.get("sync_interval", REFRESH_RATE)),
+        update_interval=timedelta(seconds=entry.options.get(CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT)),
     )
 
     # Fetch initial data so we have data when entities subscribe
