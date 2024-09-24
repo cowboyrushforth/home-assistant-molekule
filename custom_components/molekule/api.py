@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from warrant import Cognito
 from .const import API_CLIENT_ID, API_POOL_ID, API_URL, API_REGION
 import logging
+import time
 from datetime import datetime, timedelta
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,10 +66,7 @@ class MolekuleApi:
                     _LOGGER.error(f"API request failed with status code {response.status}")
                     return None
                 data = await response.json()
-                _LOGGER.warn(f"Raw API response: {data}")
-                cleaned_data = clean_none_values(data)
-                _LOGGER.warn(f"Cleaned API response: {cleaned_data}")
-                return cleaned_data
+                return clean_none_values(data)
         except aiohttp.ClientError as e:
             _LOGGER.error(f"Error communicating with API: {e}")
             return None
