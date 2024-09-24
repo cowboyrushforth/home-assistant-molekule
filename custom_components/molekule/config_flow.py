@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, CONF_REFRESH_RATE, CONF_REFRESH_RATE_DEFAULT, CONF_SILENT_AUTO
