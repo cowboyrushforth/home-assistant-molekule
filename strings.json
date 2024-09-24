@@ -1,0 +1,24 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "data": {
+                    "email": "Email",
+                    "password": "Password",
+                    "aqi_separate": "Separate AQI sensor",
+                    "silent_auto": "Silent auto mode"
+                },
+                "description": "Enter your Molekule account credentials.",
+                "title": "Molekule"
+            }
+        },
+        "error": {
+            "force_change_password": "You need to change your password before continuing. Please log in to your Molekule account and follow the instructions to change your password.",
+            "invalid_auth": "Invalid authentication. Please check your email and password.",
+            "unknown": "An unexpected error occurred. Please try again later or check the logs for more information."
+        },
+        "abort": {
+            "already_configured": "This Molekule account is already configured."
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "domain": "molekule",
+    "name": "Molekule",
+    "config_flow": true,
+    "documentation": "https://github.com/cowboyrushforth/home-assistant-molekule",
+    "issue_tracker": "https://github.com/cowboyrushforth/home-assistant-molekule/issues",
+    "dependencies": [],
+    "codeowners": ["@cowboyrushforth"],
+    "requirements": ["warrant"],
+    "iot_class": "cloud_polling",
+    "version": "0.1.0"
+}
