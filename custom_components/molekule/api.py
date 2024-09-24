@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from warrant import Cognito
 from .const import API_CLIENT_ID, API_POOL_ID, API_URL, API_REGION
 import logging
-import time
+from datetime import datetime, timedelta
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,12 +26,14 @@ class MolekuleApi:
         self.cognito = None
         self.session = None
         self.token = None
+        self.token_expiration = None
         self.executor = ThreadPoolExecutor(max_workers=1)
 
     async def authenticate(self):
         loop = asyncio.get_running_loop()
         self.cognito = await loop.run_in_executor(self.executor, self._create_and_authenticate_cognito)
         self.token = self.cognito.id_token
+        self.token_expiration = datetime.now() + timedelta(seconds=3600)  # Assume 1-hour expiration
         self.session = aiohttp.ClientSession()
 
     def _create_and_authenticate_cognito(self):
@@ -39,9 +41,24 @@ class MolekuleApi:
         cognito.authenticate(password=self.password)
         return cognito
 
-    async def get_devices(self):
-        if not self.session:
+    async def refresh_token(self):
+        try:
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(self.executor, self.cognito.renew_access_token)
+            self.token = self.cognito.id_token
+            self.token_expiration = datetime.now() + timedelta(seconds=3600)  # Assume 1-hour expiration
+            _LOGGER.info("Successfully refreshed Molekule API token")
+        except Exception as e:
+            _LOGGER.error(f"Failed to refresh Molekule API token: {e}")
+            # If token refresh fails, re-authenticate
             await self.authenticate()
+
+    async def ensure_token_valid(self):
+        if not self.token or not self.token_expiration or datetime.now() >= self.token_expiration:
+            await self.refresh_token()
+
+    async def get_devices(self):
+        await self.ensure_token_valid()
         try:
             async with self.session.get(API_URL, headers=self._headers) as response:
                 if response.status != 200:
@@ -57,8 +74,7 @@ class MolekuleApi:
             return None
 
     async def get_sensor_data(self, serial: str):
-        if not self.session:
-            await self.authenticate()
+        await self.ensure_token_valid()
         
         end_time = int(time.time() * 1000)
         start_time = end_time - 3600000  # 1 hour ago
@@ -99,6 +115,7 @@ class MolekuleApi:
         return processed_data
 
     async def set_power_status(self, serial: str, status: bool):
+        await self.ensure_token_valid()
         url = f"{API_URL}{serial}/actions/set-power-status"
         data = {"status": "on" if status else "off"}
         try:
@@ -109,6 +126,7 @@ class MolekuleApi:
             return False
 
     async def set_fan_speed(self, serial: str, speed: int):
+        await self.ensure_token_valid()
         url = f"{API_URL}{serial}/actions/set-fan-speed"
         data = {"fanSpeed": speed}
         try:
@@ -119,6 +137,7 @@ class MolekuleApi:
             return False
 
     async def set_auto_mode(self, serial: str, auto: bool, silent: bool = False):
+        await self.ensure_token_valid()
         if auto:
             url = f"{API_URL}{serial}/actions/enable-smart-mode"
             data = {"silent": str(int(silent))}
@@ -132,6 +151,7 @@ class MolekuleApi:
             return await self.set_fan_speed(serial, 1)  # Set to manual mode with lowest speed
 
     async def get_aqi(self, serial: str):
+        await self.ensure_token_valid()
         url = f"{API_URL}{serial}/air-quality-index"
         try:
             async with self.session.get(url, headers=self._headers) as response:

@@ -23,3 +23,5 @@ KEY_HUMIDITY = "humidity"
 KEY_FAN = "fan"
 KEY_MODE = "mode"
 
+# How often to poll
+REFRESH_RATE = 180
