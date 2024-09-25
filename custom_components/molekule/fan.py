@@ -9,6 +9,7 @@ from homeassistant.util.percentage import (
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from .const import DOMAIN, CONF_SILENT_AUTO
 import logging
+import asyncio
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,7 +38,12 @@ class MolekuleFan(CoordinatorEntity, FanEntity):
         self._device_id = device_id
         self._api = api
         self._attr_unique_id = f"{device_id}_fan"
-        self._attr_supported_features = FanEntityFeature.SET_SPEED | FanEntityFeature.PRESET_MODE
+        self._attr_supported_features = (
+            FanEntityFeature.SET_SPEED
+            | FanEntityFeature.PRESET_MODE
+            | FanEntityFeature.TURN_ON
+            | FanEntityFeature.TURN_OFF
+        )
         self._attr_preset_modes = ["auto", "manual"]
         self._attr_device_info = coordinator.data[device_id]["device_info"]
 
@@ -51,11 +57,11 @@ class MolekuleFan(CoordinatorEntity, FanEntity):
 
     @property
     def is_on(self):
-        return self._device['fanspeed'] != "0" if self._device else None
+        return self._device['mode'] != "off" if self._device else None
 
     @property
     def percentage(self):
-        if not self._device or self._device['fanspeed'] == "0":
+        if not self._device or self._device['mode'] == "off":
             return 0
         return ranged_value_to_percentage(SPEED_RANGE, int(self._device['fanspeed']))
 
@@ -90,8 +96,10 @@ class MolekuleFan(CoordinatorEntity, FanEntity):
         else:
             # If no percentage or preset_mode is provided, set to the lowest speed
             await self.async_set_percentage(ranged_value_to_percentage(SPEED_RANGE, SPEED_RANGE[0]))
+        await asyncio.sleep(5)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         await self._api.set_power_status(self._device_id, False)
+        await asyncio.sleep(5)
         await self.coordinator.async_request_refresh()
