@@ -32,6 +32,12 @@ There is configuration for:
 * How often to poll Molekule's api
 * Whether or not for enable "Quiet" (aka Silent) mode when the unit is set to Automatic
 
+### Installation
+First add this repository [as a custom repository](https://hacs.xyz/docs/faq/custom_repositories/).
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=molekule)
+
+
 
 ### Notes
 
