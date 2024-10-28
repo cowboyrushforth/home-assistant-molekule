@@ -4,7 +4,7 @@
 
 Home Assistant Molekule Integration
 
-Version: 0.1.9
+Version: 0.1.10
 
 ### Description
 
