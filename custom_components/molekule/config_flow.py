@@ -20,7 +20,7 @@ class MolekuleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 api = MolekuleApi(user_input[CONF_EMAIL], user_input[CONF_PASSWORD])
-                await self.hass.async_add_executor_job(api.authenticate)
+                await api.authenticate()
                 await api.close()
 
                 await self.async_set_unique_id(user_input[CONF_EMAIL])
