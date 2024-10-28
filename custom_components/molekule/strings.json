@@ -15,10 +15,12 @@
         "error": {
             "force_change_password": "You need to change your password before continuing. Please log in to your Molekule account and follow the instructions to change your password.",
             "invalid_auth": "Invalid authentication. Please check your email and password.",
+            "cannot_connect": "Failed to connect to device",
             "unknown": "An unexpected error occurred. Please try again later or check the logs for more information."
         },
         "abort": {
-            "already_configured": "This Molekule account is already configured."
+            "already_configured": "This Molekule account is already configured.",
+            "reauth_successful": "Account configuration has been updated"
         }
     }
 }
