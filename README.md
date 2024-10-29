@@ -4,11 +4,13 @@
 
 Home Assistant Molekule Integration
 
-Version: 0.1.10
+Version: 0.1.11
 
 ### Description
 
-This integration provides support for Molekule devices directly integrated into Home Assistant.  (Currently only Molekule Air Pro).
+This integration provides support for Molekule devices directly integrated into Home Assistant.  (Currently only Molekule Air Pro & Molekule Air).
+
+[Note: Molekule Air less tested!]
 
 This relies on the cloud, it talks directly to Molekule's web api.
 
