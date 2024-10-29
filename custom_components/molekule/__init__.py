@@ -38,7 +38,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             for device in devices_data["content"]:
                 serial = device["serialNumber"]
                 mac_address = device.get("macAddress")
-                sensor_data = await api.get_sensor_data(serial)
+                device_model=device.get("subProduct", {}).get("name", "Unknown Model")
+                sensor_data = None
+                if device_model != 'Molekule Air'
+                    sensor_data = await api.get_sensor_data(serial)
                 if sensor_data:
                     devices_data[serial] = sensor_data
                 
@@ -51,7 +54,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                     name=device["name"],
                     serial_number=serial,
                     manufacturer=MANUFACTURER,
-                    model=device.get("subProduct", {}).get("name", "Unknown Model"),
+                    model=device_model,
                     sw_version=device.get("firmwareVersion"),
                     connections={("mac", mac_address)} if mac_address else set(),
                 )
