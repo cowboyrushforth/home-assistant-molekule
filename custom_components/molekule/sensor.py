@@ -10,9 +10,7 @@ from homeassistant.const import (
 )
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.entity import EntityCategory
-from homeassistant.const import (
-    DOMAIN,
-)
+from .const import DOMAIN
 import logging
 from enum import Enum
 
