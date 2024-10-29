@@ -8,5 +8,5 @@
     "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/cowboyrushforth/home-assistant-molekule/issues",
     "requirements": ["warrant"],
-    "version": "0.1.11"
+    "version": "0.1.12"
 }
