@@ -40,7 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 mac_address = device.get("macAddress")
                 device_model=device.get("subProduct", {}).get("name", "Unknown Model")
                 sensor_data = None
-                if device_model != 'Molekule Air'
+                if device_model != 'Molekule Air':
                     sensor_data = await api.get_sensor_data(serial)
                 if sensor_data:
                     devices_data[serial] = sensor_data
