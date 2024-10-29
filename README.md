@@ -4,7 +4,7 @@
 
 Home Assistant Molekule Integration
 
-Version: 0.1.13-beta
+Version: 0.1.14-beta
 
 ### Description
 

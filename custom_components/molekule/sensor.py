@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_CAPABILITIES = {
     "Molekule Air": {
         "has_sensor_data": False,  # No sensordata endpoint support
-        "supported_sensors": ["air_quality", "peco_filter"]
+        "supported_sensors": ["peco_filter"]
     },
     "Molekule Air Pro": {
         "has_sensor_data": True,   # Has sensordata endpoint support
