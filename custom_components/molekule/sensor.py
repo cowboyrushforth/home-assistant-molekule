@@ -1,14 +1,39 @@
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass, SensorStateClass
-from homeassistant.const import UnitOfTime, PERCENTAGE, CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, CONCENTRATION_PARTS_PER_BILLION, CONCENTRATION_PARTS_PER_MILLION
+from homeassistant.const import (
+    UnitOfTime,
+    PERCENTAGE,
+    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    CONCENTRATION_PARTS_PER_BILLION,
+    CONCENTRATION_PARTS_PER_MILLION
+)
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.entity import EntityCategory
-from .const import DOMAIN
+from homeassistant.const import (
+    DOMAIN,
+)
 import logging
 from enum import Enum
 
 _LOGGER = logging.getLogger(__name__)
+
+# Define sensor support by model
+MODEL_CAPABILITIES = {
+    "Molekule Air": {
+        "has_sensor_data": False,  # No sensordata endpoint support
+        "supported_sensors": ["air_quality", "peco_filter"]
+    },
+    "Molekule Air Pro": {
+        "has_sensor_data": True,   # Has sensordata endpoint support
+        "supported_sensors": ["air_quality", "humidity", "pm25", "pm10", "voc", "co2", "peco_filter"]
+    }
+}
+
+DEFAULT_CAPABILITIES = {
+    "has_sensor_data": False,
+    "supported_sensors": ["air_quality", "peco_filter"]
+}
 
 class AirQualityLevel(Enum):
     UNKNOWN = "unknown"
@@ -36,24 +61,37 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         return
 
     for device in coordinator.data["content"]:
-        if device.get('subProduct', {}).get('name') == 'Molekule Air Pro':
-            device_sensors = [
-                MolekuleAirQualitySensor(coordinator, device["serialNumber"], api),
-                MolekuleHumiditySensor(coordinator, device["serialNumber"], api),
-                MolekulePM25Sensor(coordinator, device["serialNumber"], api),
-                MolekulePM10Sensor(coordinator, device["serialNumber"], api),
-                MolekuleVOCSensor(coordinator, device["serialNumber"], api),
-                MolekuleCO2Sensor(coordinator, device["serialNumber"], api),
-                MolekulePECOFilterSensor(coordinator, device["serialNumber"], api),
-            ]
-            sensors.extend(device_sensors)
-        else:
-            _LOGGER.info(f"Device {device['name']} ({device['serialNumber']}) is not a Molekule Air Pro. Skipping sensor creation.")
+        model = device.get('subProduct', {}).get('name', 'Unknown Model')
+        capabilities = MODEL_CAPABILITIES.get(model, DEFAULT_CAPABILITIES)
+        
+        device_sensors = []
+        serial = device["serialNumber"]
+        
+        # Only add sensors that are supported by this model
+        if "air_quality" in capabilities["supported_sensors"]:
+            device_sensors.append(MolekuleAirQualitySensor(coordinator, serial, api))
+        
+        if "peco_filter" in capabilities["supported_sensors"]:
+            device_sensors.append(MolekulePECOFilterSensor(coordinator, serial, api))
+            
+        # Only add sensor data endpoint sensors if the model supports them
+        if capabilities["has_sensor_data"]:
+            if "humidity" in capabilities["supported_sensors"]:
+                device_sensors.append(MolekuleHumiditySensor(coordinator, serial, api))
+            if "pm25" in capabilities["supported_sensors"]:
+                device_sensors.append(MolekulePM25Sensor(coordinator, serial, api))
+            if "pm10" in capabilities["supported_sensors"]:
+                device_sensors.append(MolekulePM10Sensor(coordinator, serial, api))
+            if "voc" in capabilities["supported_sensors"]:
+                device_sensors.append(MolekuleVOCSensor(coordinator, serial, api))
+            if "co2" in capabilities["supported_sensors"]:
+                device_sensors.append(MolekuleCO2Sensor(coordinator, serial, api))
+        
+        sensors.extend(device_sensors)
+        _LOGGER.info(f"Created {len(device_sensors)} sensors for {model} device {device['name']}")
     
     if not sensors:
         _LOGGER.warning("No compatible Molekule devices found. No sensors created.")
-    else:
-        _LOGGER.info(f"Created {len(sensors)} sensors for Molekule devices.")
     
     async_add_entities(sensors, True)
 

@@ -27,3 +27,7 @@ KEY_MODE = "mode"
 CONF_REFRESH_RATE = "conf_refresh_rate"
 CONF_REFRESH_RATE_DEFAULT = 300
 CONF_SILENT_AUTO = "conf_silent_auto"
+
+# Capability
+CAPABILITY_AUTO = "AutoFunctionality"
+CAPABILITY_MAX_FAN_SPEED = "MaxFanSpeed"
