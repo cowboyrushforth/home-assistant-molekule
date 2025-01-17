@@ -35,11 +35,12 @@ There is configuration for:
 * Whether or not for enable "Quiet" (aka Silent) mode when the unit is set to Automatic
 
 ### Installation
-First add this repository [as a custom repository](https://hacs.xyz/docs/faq/custom_repositories/).
+
+This integration requires [HACS](https://hacs.xyz/).
+Search `cowboyrushforth/home-assistant-molekule` in HACS.
+If it doesn't show, add this repository [as a custom repository in HACS](https://hacs.xyz/docs/faq/custom_repositories/).
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=molekule)
-
-
 
 ### Notes
 
