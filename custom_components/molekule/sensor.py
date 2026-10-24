@@ -71,6 +71,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         
         if "peco_filter" in capabilities["supported_sensors"]:
             device_sensors.append(MolekulePECOFilterSensor(coordinator, serial, api))
+
+        # Not every model reports a pre-filter; add it only when the API returns a value
+        if str(device.get("preFilter", "")).isdigit():
+            device_sensors.append(MolekulePreFilterSensor(coordinator, serial, api))
             
         # Only add sensor data endpoint sensors if the model supports them
         if capabilities["has_sensor_data"]:
@@ -174,6 +178,22 @@ class MolekulePECOFilterSensor(MolekuleSensorBase):
             return "mdi:alert-outline"
         else:
             return "mdi:check-circle-outline"
+
+class MolekulePreFilterSensor(MolekulePECOFilterSensor):
+    def __init__(self, coordinator: DataUpdateCoordinator, device_id: str, api):
+        MolekuleSensorBase.__init__(self, coordinator, device_id, api, "pre_filter")
+        self._attr_device_class = None
+        self._attr_native_unit_of_measurement = PERCENTAGE
+
+    @property
+    def native_value(self):
+        if not self._device or 'preFilter' not in self._device:
+            return None
+        try:
+            return int(self._device['preFilter'])
+        except ValueError:
+            _LOGGER.error(f"Invalid preFilter value: {self._device['preFilter']}")
+            return None
 
 class MolekuleHumiditySensor(MolekuleSensorBase):
     def __init__(self, coordinator: DataUpdateCoordinator, device_id: str, api):
